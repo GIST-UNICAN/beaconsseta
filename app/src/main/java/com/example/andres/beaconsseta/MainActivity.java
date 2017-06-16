@@ -65,9 +65,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        lvBeacons = (ListView) findViewById(R.id.lv_beacons);
         reactiveBeacons = new ReactiveBeacons(this);
         beacons = new HashMap<>();
+
     }
 
     @Override
@@ -77,31 +77,10 @@ public class MainActivity extends AppCompatActivity {
         if (!canObserveBeacons()) {
             return;
         }
-
-        startSubscription();
+        Intent i = new Intent(this, BackgroundService.class);
+        this.startService(i);
     }
 
-    private void startSubscription() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            lastSavedTime = System.currentTimeMillis();
-            requestCoarseLocationPermission();
-            return;
-        }
-
-        subscription = reactiveBeacons.observe()
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Beacon>() {
-                    @Override
-                    public void accept(@NonNull Beacon beacon) throws Exception {
-                        beacons.put(beacon.device.getAddress(), beacon);
-                        refreshBeaconList();
-                    }
-                });
-    }
 
     private boolean canObserveBeacons() {
         if (!reactiveBeacons.isBleSupported()) {
@@ -123,90 +102,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void refreshBeaconList() {
-        List<String> list = new ArrayList<>();
-
-        if (lastSavedTime + WAIT_TIME_REFRESH_DATA <= System.currentTimeMillis() || primeraVez) { // solo se realiza cada un tiempo determinado
-            primeraVez = false;
-            for (Beacon beacon : beacons.values()) { // para cada beacon de la lista de beacons descubierta
-                list.add(getBeaconItemString(beacon)); // se genera el arraylist mostrable
-                if (beacon.device.getName() != null) { // si el nombre no es nulo y es de tipo estimote se almacena la mac
-                    if (beacon.device.getName().equalsIgnoreCase("EST")) {
-                        Log.d("BEACON ESTIMOTE:", (beacon.device.getAddress()));
-                        if (gistBeacons.indexOf(beacon.device.getAddress()) != -1) { // se comprueba que sea una mac del listado de nuestras beacons
-                            //se guarda la mac y en X minutos se vuelve a comprobar que esa mac siga siendo visible
-                            lastSavedTime = System.currentTimeMillis();
-                            int elemento = esElementoVisto(beacon.device.getAddress());
-                            //si el elemento comple las condiciones se notifica
-                            if (elemento != -1) {
-                                showSurveyNotification("ESTIMOTE numero de beacon " + Integer.valueOf(gistBeacons.indexOf(beacon.device.getAddress())+1));
-                            }
-                        }
-                    }
-                }
-            }
-            int itemLayoutId = android.R.layout.simple_list_item_1;
-            lvBeacons.setAdapter(new ArrayAdapter<>(this, itemLayoutId, list));
-        }
-
-
-    }
-
-    private int esElementoVisto(String macElemento) { // devuelve la posicion si coinciden y ha pasado el tiempo necesarios o -1 si no esta almacenado o lo esta pero no ha pasado el tiempo, en cuyo caso lo guarda en la lista
-        for (String[] elemento : listaMacsBeacons) {
-            for (String mac : elemento) {
-                if (mac.equalsIgnoreCase(macElemento)) {
-                    String[] elementoModificado = {elemento[0], elemento[1], String.valueOf(System.currentTimeMillis())};
-                    listaMacsBeacons.set(listaMacsBeacons.indexOf(elemento), elementoModificado);
-                    if (Long.parseLong(elemento[2]) + WAIT_TIME_SAVE_VALUES <= System.currentTimeMillis()) {
-                        return listaMacsBeacons.indexOf(elementoModificado);
-                    }
-                }
-            }
-        }
-        String elementoLista[] = {macElemento, String.valueOf(System.currentTimeMillis()), String.valueOf(System.currentTimeMillis())}; //mac, primera vista, ultima vista
-        listaMacsBeacons.add(elementoLista);
-        return -1;
-    }
-
-    private void showSurveyNotification(String mensage) {
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher_round)
-                        .setContentTitle("My notification")
-                        .setContentText(mensage);
-// Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://google.es"));
-
-// The stack builder object will contain an artificial back stack for the
-// started Activity.
-// This ensures that navigating backward from the Activity leads out of
-// your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-// Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(MainActivity.class);
-// Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
-        mNotificationManager.notify(1, mBuilder.build());
-    }
-
-    private String getBeaconItemString(Beacon beacon) {
-        String mac = beacon.device.getAddress();
-        int rssi = beacon.rssi;
-        double distance = beacon.getDistance();
-        Proximity proximity = beacon.getProximity();
-        String name = beacon.device.getName();
-        return String.format(ITEM_FORMAT, mac, rssi, distance, proximity, name);
-    }
 
     @Override
     protected void onPause() {
@@ -225,7 +120,8 @@ public class MainActivity extends AppCompatActivity {
         final boolean permissionGranted = grantResults[0] == PERMISSION_GRANTED;
 
         if (isCoarseLocation && permissionGranted && subscription == null) {
-            startSubscription();
+            Intent i = new Intent(this, BackgroundService.class);
+            this.startService(i);
         }
     }
 
