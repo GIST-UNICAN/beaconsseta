@@ -3,5 +3,6 @@
 
     <string name="app_name">SETA GIST UNICAN</string>
     <string name="button_run_scheduler">Run Schedulers Example</string>
+    <string name="TEXTO_EVALUACION">What do you think about bus service?</string>
 
 </resources>
