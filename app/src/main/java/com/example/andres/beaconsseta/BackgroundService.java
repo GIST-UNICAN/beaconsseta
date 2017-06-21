@@ -79,7 +79,7 @@ public class BackgroundService extends Service {
         beacons = new HashMap<>();
 
         startSubscription();
-        return Service.START_NOT_STICKY;
+        return START_STICKY;
     }
 
     private void startSubscription() {
@@ -201,16 +201,24 @@ public class BackgroundService extends Service {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        // TODO Auto-generated method stub
         Intent restartService = new Intent(getApplicationContext(),
                 this.getClass());
         restartService.setPackage(getPackageName());
         PendingIntent restartServicePI = PendingIntent.getService(
                 getApplicationContext(), 1, restartService,
                 PendingIntent.FLAG_ONE_SHOT);
+
         //Restart the service once it has been killed android
         AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 100, restartServicePI);
 
+    }
+
+    @Override
+    public void onCreate() {
+        // TODO Auto-generated method stub
+        super.onCreate();
+
+        //start a separate thread and start listening to your network object
     }
 }
