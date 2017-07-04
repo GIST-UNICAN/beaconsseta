@@ -166,7 +166,7 @@ public class BackgroundService extends Service {
                         .setContentTitle("Seta survey")
                         .setContentText(mensage);
 // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://grupos.unican.es/gist/index.php/es/"));
+        Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://encuestas.unican.es/encuestas/index.php/379867?lang=es"));
 
 // The stack builder object will contain an artificial back stack for the
 // started Activity.
