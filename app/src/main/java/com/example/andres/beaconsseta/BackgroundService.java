@@ -57,7 +57,7 @@ public class BackgroundService extends Service {
     //guardamos una lista de macs de las beacons de estimote
     private List<String[]> listaMacsBeacons = new ArrayList<>();
     private long lastSavedTime;
-    private long WAIT_TIME_REFRESH_DATA = 10000;
+    private long WAIT_TIME_REFRESH_DATA = 10000 ;
     private long WAIT_TIME_SAVE_VALUES = 10000; //wait time in milisecons betwen saved values
 
     //lista de nuestras beacons
@@ -77,6 +77,7 @@ public class BackgroundService extends Service {
         //TODO do something useful
         reactiveBeacons = new ReactiveBeacons(this);
         beacons = new HashMap<>();
+        Toast.makeText(getApplicationContext(),"Beacon service running",Toast.LENGTH_LONG).show();
 
         startSubscription();
         return START_STICKY;
@@ -130,7 +131,7 @@ public class BackgroundService extends Service {
                             if (elemento != -1 && !encuestaHecha) {
                                 Log.d("Nº Beacon detect", String.valueOf(Integer.valueOf(gistBeacons.indexOf(beacon.device.getAddress()) + 1)));
                                 showSurveyNotification(String.valueOf(getApplicationContext().getText(R.string.TEXTO_EVALUACION)));
-                                encuestaHecha = true;
+                              // encuestaHecha = true;
                             }
 
                         }
@@ -186,7 +187,7 @@ public class BackgroundService extends Service {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 // mId allows you to update the notification later on.
-        mNotificationManager.notify(0, mBuilder.build());
+        mNotificationManager.notify(1, mBuilder.build());
     }
 
     private String getBeaconItemString(Beacon beacon) {
@@ -204,6 +205,8 @@ public class BackgroundService extends Service {
         Intent restartService = new Intent(getApplicationContext(),
                 this.getClass());
         restartService.setPackage(getPackageName());
+        Toast.makeText(getApplicationContext(),"Restarting "+getPackageName().toString(),Toast.LENGTH_LONG).show();
+
         PendingIntent restartServicePI = PendingIntent.getService(
                 getApplicationContext(), 1, restartService,
                 PendingIntent.FLAG_ONE_SHOT);
