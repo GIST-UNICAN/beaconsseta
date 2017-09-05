@@ -37,11 +37,23 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data android:scheme="package" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <data android:scheme="package" />
+            </intent-filter>
         </receiver>
 
         <service
             android:name=".LaunchServiceOnBoot"
             android:exported="false"></service>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="28aba25e9f7260d66e62bd3418729f7744bab8a2" />
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

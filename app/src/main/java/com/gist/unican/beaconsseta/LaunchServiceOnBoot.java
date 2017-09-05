@@ -16,6 +16,9 @@ public class LaunchServiceOnBoot extends IntentService {
     public LaunchServiceOnBoot(String name) {
         super(name);
     }
+    public LaunchServiceOnBoot(){
+        super("NONE");
+    }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
