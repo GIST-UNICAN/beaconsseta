@@ -230,8 +230,8 @@ public class BackgroundService extends Service {
                 .setContentText("The beacon detection is running")
                 .setSmallIcon(R.mipmap.ic_launcher);
 
-        Intent i=new Intent(this, MainActivity.class);
-        PendingIntent contentIntent=PendingIntent.getActivity(this, 0,i, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent i = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(contentIntent);
 
         //Pasamos el servicio a primer plano
