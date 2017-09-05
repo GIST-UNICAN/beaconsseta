@@ -2,6 +2,7 @@ package com.gist.unican.beaconsseta;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -17,6 +18,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -57,7 +59,7 @@ public class BackgroundService extends Service {
     //guardamos una lista de macs de las beacons de estimote
     private List<String[]> listaMacsBeacons = new ArrayList<>();
     private long lastSavedTime;
-    private long WAIT_TIME_REFRESH_DATA = 100000 ;
+    private long WAIT_TIME_REFRESH_DATA = 100000;
     private long WAIT_TIME_SAVE_VALUES = 10000; //wait time in milisecons betwen saved values
 
     //lista de nuestras beacons
@@ -72,12 +74,13 @@ public class BackgroundService extends Service {
         return null;
     }
 
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //TODO do something useful
         reactiveBeacons = new ReactiveBeacons(this);
         beacons = new HashMap<>();
-        Toast.makeText(getApplicationContext(),"Beacon service running",Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Beacon service running", Toast.LENGTH_LONG).show();
 
         startSubscription();
         return START_STICKY;
@@ -205,7 +208,7 @@ public class BackgroundService extends Service {
         Intent restartService = new Intent(getApplicationContext(),
                 this.getClass());
         restartService.setPackage(getPackageName());
-        Log.d("Restarting ",getPackageName().toString());
+        Log.d("Restarting ", getPackageName().toString());
 
         PendingIntent restartServicePI = PendingIntent.getService(
                 getApplicationContext(), 1, restartService,
@@ -221,6 +224,18 @@ public class BackgroundService extends Service {
     public void onCreate() {
         // TODO Auto-generated method stub
         super.onCreate();
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setContentTitle(getResources().getString(R.string.app_name))
+                .setContentText("The beacon detection is running")
+                .setSmallIcon(R.mipmap.ic_launcher);
+
+        Intent i=new Intent(this, MainActivity.class);
+        PendingIntent contentIntent=PendingIntent.getActivity(this, 0,i, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        //Pasamos el servicio a primer plano
+        startForeground(1, builder.build());
 
         //start a separate thread and start listening to your network object
     }
