@@ -1,4 +1,4 @@
-package com.example.andres.beaconsseta;
+package com.gist.unican.beaconsseta;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

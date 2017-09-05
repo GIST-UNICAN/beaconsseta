@@ -1,4 +1,4 @@
-package com.example.andres.beaconsseta;
+package com.gist.unican.beaconsseta;
 
 import android.Manifest;
 import android.app.NotificationManager;

@@ -1,42 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity"
-    >
+
+    tools:context=".MainActivity">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        >
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="30"
-            app:srcCompat="@android:drawable/stat_sys_data_bluetooth"
-            android:background="@color/colorPrimaryDark"/>
+            android:layout_height="0dp"
+            android:layout_weight="40"
+            android:padding="50dp"
+            android:background="@color/colorPrimary"
+            app:srcCompat="@drawable/seta"
+            tools:srcCompat="@mipmap/ic_seta" />
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:gravity="center"
-            android:text="SETA SERVICE BEACONS DETECTION"
-            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:layout_weight="35"/>
+            android:layout_centerVertical="true"
+            android:layout_margin="10dp"
+            android:layout_weight="30"
+            android:gravity="center"
+            android:text="SETA SERVICE BEACONS DETECTION" />
 
         <TextView
             android:id="@+id/textView2"
@@ -44,16 +42,19 @@
             android:layout_height="0dp"
             android:layout_centerHorizontal="true"
             android:layout_gravity="top"
-            android:layout_weight="35"
+            android:layout_margin="10dp"
+            android:layout_weight="30"
             android:gravity="center"
             android:text="PLEASE ENABLE YOUR BLUETOOTH CONEXION" />
+
         <TextView
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_centerHorizontal="true"
             android:layout_gravity="top"
-            android:layout_weight="35"
+            android:layout_margin="10dp"
+            android:layout_weight="30"
             android:gravity="center"
             android:text="PLEASE PRESS HOME BUTTON AND THE SERVICE WILL START " />
 
