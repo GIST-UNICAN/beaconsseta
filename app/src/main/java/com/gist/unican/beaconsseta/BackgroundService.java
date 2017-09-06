@@ -81,7 +81,22 @@ public class BackgroundService extends Service {
         reactiveBeacons = new ReactiveBeacons(this);
         beacons = new HashMap<>();
         Toast.makeText(getApplicationContext(), "Beacon service running", Toast.LENGTH_LONG).show();
+        // TODO Auto-generated method stub
+        super.onCreate();
+        //servicio foreground
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setContentTitle(getResources().getString(R.string.app_name))
+                .setContentText("The beacon detection is running")
+                .setSmallIcon(R.mipmap.ic_launcher);
 
+        Intent i = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        //Pasamos el servicio a primer plano
+        startForeground(1, builder.build());
+
+        //start a separate thread and start listening to your network object
         startSubscription();
         return START_STICKY;
     }
@@ -222,21 +237,6 @@ public class BackgroundService extends Service {
 
     @Override
     public void onCreate() {
-        // TODO Auto-generated method stub
-        super.onCreate();
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle(getResources().getString(R.string.app_name))
-                .setContentText("The beacon detection is running")
-                .setSmallIcon(R.mipmap.ic_launcher);
-
-        Intent i = new Intent(this, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(contentIntent);
-
-        //Pasamos el servicio a primer plano
-        startForeground(1, builder.build());
-
-        //start a separate thread and start listening to your network object
     }
 }
