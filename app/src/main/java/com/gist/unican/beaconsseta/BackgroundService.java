@@ -24,6 +24,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+
+import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
+import com.estimote.coresdk.service.BeaconManager;
 import com.github.pwittchen.reactivebeacons.library.rx2.Beacon;
 import com.github.pwittchen.reactivebeacons.library.rx2.Proximity;
 import com.github.pwittchen.reactivebeacons.library.rx2.ReactiveBeacons;
@@ -33,6 +36,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -97,20 +101,58 @@ public class BackgroundService extends Service {
         startForeground(1, builder.build());
 
         //start a separate thread and start listening to your network object
+
         startSubscription();
+        //stopSubscription();
+
         return START_STICKY;
     }
 
+    private void stopSubscription() {
+
+        if (subscription != null && !subscription.isDisposed()) {
+            subscription.dispose();
+            Log.d("OFF","OFF");
+        }
+
+    }
+
     private void startSubscription() {
+        Log.d("OFF","OFFon");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             lastSavedTime = System.currentTimeMillis();
             return;
-        }
 
-        subscription = reactiveBeacons.observe()
+        }
+        final BeaconManager beaconManager = new BeaconManager(getApplicationContext());
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                Log.d("scanning: ","findind");
+                beaconManager.startMonitoring(new BeaconRegion(
+                        "monitored region",
+                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
+                        null, null));
+                beaconManager.setBackgroundScanPeriod(10000,10000);
+                beaconManager.setMonitoringListener(new BeaconManager.BeaconMonitoringListener() {
+
+                    @Override
+                    public void onEnteredRegion(BeaconRegion beaconRegion, List<com.estimote.coresdk.recognition.packets.Beacon> beacons) {
+                        showSurveyNotification(String.valueOf(getApplicationContext().getText(R.string.TEXTO_EVALUACION)));
+                    }
+
+                    @Override
+                    public void onExitedRegion(BeaconRegion region) {
+                        showSurveyNotification("out");
+                    }
+                });
+            }
+        });
+
+        /*subscription = reactiveBeacons.observe()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Beacon>() {
@@ -121,12 +163,15 @@ public class BackgroundService extends Service {
                             refreshBeaconList();// solo se realiza cada un tiempo determinado
                         }
                     }
-                });
+
+                });*/
+
+
     }
 
 
     private void refreshBeaconList() {
-        Log.d("REFRESHING BEACON ","REFRESHING BEACON");
+        Log.d("REFRESHING BEACON ", "REFRESHING BEACON");
         List<String> list = new ArrayList<>();
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         //Toast.makeText(getApplicationContext(),"El bluetooth ha sido desactivado, algunos servicios dejaran de funcionar",Toast.LENGTH_LONG).show();
