@@ -59,7 +59,7 @@ public class BackgroundService extends Service {
     //guardamos una lista de macs de las beacons de estimote
     private List<String[]> listaMacsBeacons = new ArrayList<>();
     private long lastSavedTime;
-    private long WAIT_TIME_REFRESH_DATA = 100000;
+    private long WAIT_TIME_REFRESH_DATA = 300000;
     private long WAIT_TIME_SAVE_VALUES = 10000; //wait time in milisecons betwen saved values
 
     //lista de nuestras beacons
@@ -117,13 +117,16 @@ public class BackgroundService extends Service {
                     @Override
                     public void accept(@NonNull Beacon beacon) throws Exception {
                         beacons.put(beacon.device.getAddress(), beacon);
-                        refreshBeaconList();
+                        if (lastSavedTime + WAIT_TIME_REFRESH_DATA <= System.currentTimeMillis() || primeraVez) {
+                            refreshBeaconList();// solo se realiza cada un tiempo determinado
+                        }
                     }
                 });
     }
 
 
     private void refreshBeaconList() {
+        Log.d("REFRESHING BEACON ","REFRESHING BEACON");
         List<String> list = new ArrayList<>();
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         //Toast.makeText(getApplicationContext(),"El bluetooth ha sido desactivado, algunos servicios dejaran de funcionar",Toast.LENGTH_LONG).show();
@@ -134,7 +137,7 @@ public class BackgroundService extends Service {
             }
         }
 
-        if (lastSavedTime + WAIT_TIME_REFRESH_DATA <= System.currentTimeMillis() || primeraVez) { // solo se realiza cada un tiempo determinado
+        if (true) {
             primeraVez = false;
             for (Beacon beacon : beacons.values()) { // para cada beacon de la lista de beacons descubierta
                 list.add(getBeaconItemString(beacon)); // se genera el arraylist mostrable
@@ -239,4 +242,13 @@ public class BackgroundService extends Service {
     public void onCreate() {
 
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i("EXIT", "ondestroy!");
+        Intent broadcastIntent = new Intent("com.gist.unican.RestartSensor");
+        sendBroadcast(broadcastIntent);
+    }
+
 }

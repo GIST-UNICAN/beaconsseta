@@ -12,6 +12,7 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -29,9 +30,9 @@
 
         <service
             android:name=".BackgroundService"
-            android:label="@string/app_name"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true"
+            android:label="@string/app_name" />
 
         <receiver android:name=".BootBroadcastReceiver">
             <intent-filter>
@@ -39,21 +40,33 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
+
                 <data android:scheme="package" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
+
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
 
         <service
             android:name=".LaunchServiceOnBoot"
-            android:exported="false"></service>
+            android:exported="false" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="28aba25e9f7260d66e62bd3418729f7744bab8a2" />
+
+        <receiver
+            android:name=".RestartBluetooth"
+            android:enabled="true"
+            android:exported="true"
+            android:label="RestartServiceWhenStopped">
+            <intent-filter>
+                <action android:name="com.gist.unican.RestartSensor" />
+            </intent-filter>
+        </receiver>
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
