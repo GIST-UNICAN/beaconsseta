@@ -112,13 +112,13 @@ public class BackgroundService extends Service {
 
         if (subscription != null && !subscription.isDisposed()) {
             subscription.dispose();
-            Log.d("OFF","OFF");
+            Log.d("OFF", "OFF");
         }
 
     }
 
     private void startSubscription() {
-        Log.d("OFF","OFFon");
+        Log.d("OFF", "OFFon");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -131,17 +131,36 @@ public class BackgroundService extends Service {
         beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
             @Override
             public void onServiceReady() {
-                Log.d("scanning: ","findind");
+                Log.d("scanning: ", "findind");
                 beaconManager.startMonitoring(new BeaconRegion(
                         "monitored region",
                         UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
                         null, null));
-                beaconManager.setBackgroundScanPeriod(10000,10000);
+                //beaconManager.setBackgroundScanPeriod(10000, 10000);
                 beaconManager.setMonitoringListener(new BeaconManager.BeaconMonitoringListener() {
-
                     @Override
                     public void onEnteredRegion(BeaconRegion beaconRegion, List<com.estimote.coresdk.recognition.packets.Beacon> beacons) {
-                        showSurveyNotification(String.valueOf(getApplicationContext().getText(R.string.TEXTO_EVALUACION)));
+                        primeraVez = false;
+                        for (com.estimote.coresdk.recognition.packets.Beacon beacon : beacons) {
+                            if (beacon.getMacAddress().toString() != null) { // si el nombre no es nulo y es de tipo estimote se almacena la mac
+                                Log.d("BEACON ESTIMOTE:", (beacon.getMacAddress().toString()));
+                                if (gistBeacons.indexOf(beacon.getMacAddress().toString()) != -1) { // se comprueba que sea una mac del listado de nuestras beacons
+                                    //se guarda la mac y en X minutos se vuelve a comprobar que esa mac siga siendo visible
+                                    lastSavedTime = System.currentTimeMillis();
+                                    int elemento = esElementoVisto(beacon.getMacAddress().toString());
+                                    //si el elemento comple las condiciones se notifica
+                                    if (elemento != -1 && !encuestaHecha) {
+                                        Log.d("Nº Beacon detect", String.valueOf(Integer.valueOf(gistBeacons.indexOf(beacon.getMacAddress().toString()) + 1)));
+                                        showSurveyNotification(String.valueOf(getApplicationContext().getText(R.string.TEXTO_EVALUACION)));
+                                        encuestaHecha = true;
+                                    }
+
+                                }
+
+                            }
+                        }
+
+                        //showSurveyNotification(String.valueOf(getApplicationContext().getText(R.string.TEXTO_EVALUACION)));
                     }
 
                     @Override
